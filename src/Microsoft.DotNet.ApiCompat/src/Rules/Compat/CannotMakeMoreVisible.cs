@@ -6,7 +6,6 @@ using Microsoft.Cci.Extensions.CSharp;
 
 namespace Microsoft.Cci.Differs.Rules
 {
-    // Removed because it appears the *MustExist rules already supersede these.
     [ExportDifferenceRule]
     internal class CannotMakeMoreVisible : CompatDifferenceRule
     {
@@ -50,20 +49,20 @@ namespace Microsoft.Cci.Differs.Rules
             switch (implementation)
             {
                 case TypeMemberVisibility.Public:
-                    // If implementation is public then contract can be any visibility.
+                    // If implementation is public, contract can have any visibility.
                     return false;
                 case TypeMemberVisibility.FamilyOrAssembly:
-                    // protected internal is an upgrade from everything but public.
+                    // protected internal reduces visibility from public.
                     return contract == TypeMemberVisibility.Public;
                 case TypeMemberVisibility.Assembly: // internal
                 case TypeMemberVisibility.Family: // protected
-                    // internal and protected are upgrades only from private or private protected.
+                    // internal and protected reduce visibility from all but private or private protected.
                     return contract != TypeMemberVisibility.Private && contract != TypeMemberVisibility.FamilyAndAssembly;
                 case TypeMemberVisibility.FamilyAndAssembly:
-                    // private protected is very restrictive; only an upgrade from private.
+                    // private protected is very restrictive; reduces visibility from all but private.
                     return contract != TypeMemberVisibility.Private;
                 case TypeMemberVisibility.Private:
-                    // private in the implementation is always a downgrade.
+                    // private in the implementation always reduces visibility.
                     return true;
             }
 
